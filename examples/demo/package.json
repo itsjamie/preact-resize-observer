@@ -11,37 +11,17 @@
     "lint": "eslint src",
     "build-demo": "preact build --json --clean --production --dest ../../docs/demo"
   },
-  "eslintConfig": {
-    "extends": "eslint-config-synacor",
-    "rules": {
-      "react/sort-comp": "off",
-      "indent": [
-        "error",
-        2
-      ],
-      "react/jsx-indent-props": [
-        "error",
-        2
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "build/*"
-  ],
   "devDependencies": {
-    "eslint": "^4.5.0",
-    "eslint-config-synacor": "^1.1.0",
-    "if-env": "^1.0.0",
-    "node-sass": "4.9.0",
-    "preact-cli": "^2.0.0",
-    "sass-loader": "7.0.3"
+    "if-env": "^1.0.4",
+    "node-sass": "6.0.0",
+    "preact-cli": "^3.2.2",
+    "sass-loader": "^12.0.0"
   },
   "dependencies": {
-    "classnames": "2.2.6",
-    "normalize.css": "8.0.0",
-    "preact": "^8.2.1",
-    "preact-compat": "^3.17.0",
-    "preact-feather": "2.0.1",
+    "classnames": "^2.3.1",
+    "normalize.css": "^8.0.0",
+    "preact": "^10.5.13",
+    "preact-feather": "^4.2.1",
     "preact-resize-observer": "link:../../"
   }
 }

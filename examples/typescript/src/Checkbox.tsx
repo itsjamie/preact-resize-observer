@@ -1,9 +1,9 @@
-import { h, FunctionalComponent } from 'preact';
+import { h, FunctionalComponent, JSX } from 'preact';
 
 interface ICheckboxProps {
   label: string;
   checked: boolean;
-  onChange: JSX.GenericEventHandler;
+  onChange: JSX.GenericEventHandler<HTMLInputElement>;
 }
 
 const Checkbox: FunctionalComponent<ICheckboxProps> = (props: ICheckboxProps) => (

@@ -11,7 +11,13 @@
     "baseUrl": ".",
     "paths": {
       // Only needed due to symlinking
-      "preact": ["node_modules/preact"]
-    }
-  }
+      "preact": [
+        "node_modules/preact"
+      ]
+    },
+    "types": []
+  },
+  "include": [
+    "src/**/*.tsx"
+  ]
 }

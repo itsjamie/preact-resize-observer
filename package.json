@@ -9,7 +9,7 @@
     "build": "tsc --outDir dev/ --project tsconfig.build.json",
     "release": "rm -r dist/ && npm run release:cjs && npm run release:esm",
     "release:cjs": "tsc --module commonjs --outDir dist/cjs/ --project tsconfig.build.json",
-    "release:esm": "tsc --module es2015 --outDir dist/esm/ --project tsconfig.build.json",
+    "release:esm": "tsc --target es2015 --module es2015 --outDir dist/esm/ --project tsconfig.build.json",
     "test": "jest"
   },
   "repository": {

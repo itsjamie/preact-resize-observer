@@ -73,7 +73,7 @@ export default class App extends Component<{}, IAppState> {
     });
   }
 
-  toggleState = (key: 'observeWidth'|'observeHeight'|'initial') => () => {
+  toggleState = (key: 'observeWidth' | 'observeHeight' | 'initial') => () => {
     this.setState(prevState => ({
       [key]: !prevState[key],
     }));
