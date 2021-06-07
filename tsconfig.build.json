@@ -1,7 +1,14 @@
 {
   "extends": "./tsconfig",
   "compilerOptions": {
-    "lib": ["dom", "es5", "scripthost"]
+    "target": "es5",
+    "lib": [
+      "dom",
+      "es5",
+      "scripthost"
+    ],
+    "sourceMap": false,
+    "inlineSourceMap": false,
   },
   "exclude": [
     "**/*.spec.ts?"

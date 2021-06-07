@@ -1,11 +1,7 @@
 import { h } from 'preact';
-import { shallow, RenderContext } from 'preact-render-spy';
+import { render, cleanup, screen } from '@testing-library/preact';
 
 import PreactResizeObserver, { InnerRefProp, OnResizeProp } from './index';
-
-// defined in ./helpers/tests.js
-declare const overrideObject: () => void;
-declare const restoreObject: () => void;
 
 const originalCreateElement = document.createElement.bind(document);
 
@@ -14,7 +10,7 @@ let elHeight = 100;
 
 // Helper Fns
 
-function noop() {}
+function noop() { }
 
 function changeElementSize(width: number, height: number) {
   elWidth = width;
@@ -23,17 +19,13 @@ function changeElementSize(width: number, height: number) {
   window.dispatchEvent(new Event('resize'));
 }
 
-function cleanup(ctx: RenderContext<any, any>) {
-  ctx.render(null as any);
-}
-
 function wait(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
 
-type CallbackResolver = (resolve: () => void) => void;
+type CallbackResolver = (resolve: (value: unknown) => void) => void;
 function waitForCb(cb: CallbackResolver) {
   return new Promise((resolve) => {
     cb(resolve);
@@ -42,16 +34,20 @@ function waitForCb(cb: CallbackResolver) {
 
 // Start Tests
 
-test('child elements are rendered', () => {
-  const context = shallow(<PreactResizeObserver onResize={noop}><span>test</span></PreactResizeObserver>);
-  expect(context.find('div').contains(<span>test</span>)).toBeTruthy();
-  cleanup(context);
+afterAll(() => {
+  cleanup()
+})
+
+test('child elements are rendered', async () => {
+  render(<PreactResizeObserver onResize={noop}><span>test</span></PreactResizeObserver>);
+  const field = await screen.queryByText('test')
+  expect(field).toBeTruthy();
 });
 
 test('custom tag is used', () => {
-  const context = shallow(<PreactResizeObserver onResize={noop} tag="section" />);
-  expect(context.find('section')).toHaveLength(1);
-  cleanup(context);
+  const { container } = render(<PreactResizeObserver onResize={noop} tag="section" />);
+  const field = container.querySelector('section')
+  expect(field).toBeTruthy();
 });
 
 test('inner ref is provided', (done) => {
@@ -63,18 +59,16 @@ test('inner ref is provided', (done) => {
 
     expect(ref).toBeInstanceOf(Element);
     expect(ref.classList.toString()).toBe(className);
-
-    cleanup(context);
     done();
   };
 
-  const context = shallow(<PreactResizeObserver onResize={noop} innerRef={handleRef} className={className} />);
+  render(<PreactResizeObserver onResize={noop} innerRef={handleRef} className={className} />);
 });
 
 describe('onResize callback', () => {
   beforeAll(() => {
     // Override Object to pass the polyfill's instanceof check
-    overrideObject();
+
 
     // Override clientHeight/Width methods of created elements to return values the tests can control.
     // These values are used by the resize observer to determine if the size of an element has changed.
@@ -95,7 +89,6 @@ describe('onResize callback', () => {
   });
 
   afterAll(() => {
-    restoreObject();
     document.createElement = originalCreateElement;
   });
 
@@ -110,8 +103,7 @@ describe('onResize callback', () => {
     });
 
     let onResize: OnResizeProp = jest.fn();
-
-    const context = shallow(<PreactResizeObserver onResize={onResize} />);
+    render(<PreactResizeObserver onResize={onResize} />);
 
     // Wait to allow intial observer flow to complete
     await wait(50);
@@ -119,32 +111,30 @@ describe('onResize callback', () => {
 
     await waitForCb((resolve) => {
       onResize = resizeHandler(resolve);
-      context.render(<PreactResizeObserver onResize={onResize} />);
+      render(<PreactResizeObserver onResize={onResize} />);
       changeElementSize(300, 100);
     });
     expect(onResize).toBeCalledWith(300, 100);
 
     await waitForCb((resolve) => {
       onResize = resizeHandler(resolve);
-      context.render(<PreactResizeObserver onResize={onResize} />);
+      render(<PreactResizeObserver onResize={onResize} />);
       changeElementSize(300, 300);
     });
     expect(onResize).toBeCalledWith(300, 300);
 
     await waitForCb((resolve) => {
       onResize = resizeHandler(resolve);
-      context.render(<PreactResizeObserver onResize={onResize} />);
+      render(<PreactResizeObserver onResize={onResize} />);
       changeElementSize(50, 50);
     });
     expect(onResize).toBeCalledWith(50, 50);
-
-    cleanup(context);
   });
 
   test('is not called on initial mount', async () => {
     const onResize = jest.fn();
 
-    const context = shallow(<PreactResizeObserver onResize={onResize} initial={false} />);
+    render(<PreactResizeObserver onResize={onResize} initial={false} />);
 
     // Wait to allow intial observer flow to complete
     await wait(50);
@@ -154,14 +144,12 @@ describe('onResize callback', () => {
 
     await wait(50);
     expect(onResize).toBeCalledWith(400, 400);
-
-    cleanup(context);
   });
 
-  test('is called only when width changes', async  () => {
+  test('is called only when width changes', async () => {
     const onResize = jest.fn();
 
-    const context = shallow(<PreactResizeObserver onResize={onResize} vertical={false} />);
+    render(<PreactResizeObserver onResize={onResize} vertical={false} />);
 
     await wait(50);
     changeElementSize(300, elHeight);
@@ -173,14 +161,12 @@ describe('onResize callback', () => {
     // called on initial mount and when width changed
     expect(onResize).toBeCalledTimes(2);
     expect(onResize).nthCalledWith(2, 300, 100);
-
-    cleanup(context);
   });
 
-  test('is called only when height changes', async  () => {
+  test('is called only when height changes', async () => {
     const onResize = jest.fn();
 
-    const context = shallow(<PreactResizeObserver onResize={onResize} horizontal={false} />);
+    render(<PreactResizeObserver onResize={onResize} horizontal={false} />);
 
     await wait(50);
     changeElementSize(300, elHeight);
@@ -192,8 +178,6 @@ describe('onResize callback', () => {
     // called on initial mount and when height changed
     expect(onResize).toBeCalledTimes(2);
     expect(onResize).nthCalledWith(2, 300, 200);
-
-    cleanup(context);
   });
 
   test('is called for size changes to a custom element', async () => {
@@ -206,7 +190,7 @@ describe('onResize callback', () => {
     const customElement = document.createElement('div');
 
     // Start observing custom element
-    const context = shallow(<PreactResizeObserver onResize={onResize} element={customElement}/>);
+    render(<PreactResizeObserver onResize={onResize} element={customElement} />);
 
     // Wait to allow intial observer flow to complete
     await wait(50);
@@ -214,7 +198,7 @@ describe('onResize callback', () => {
 
     await waitForCb((resolve) => {
       onResize = resizeHandler(resolve);
-      context.render(<PreactResizeObserver onResize={onResize} element={customElement} />);
+      render(<PreactResizeObserver onResize={onResize} element={customElement} />);
       changeElementSize(300, 100);
     });
     expect(onResize).toBeCalledWith(300, 100);
@@ -222,7 +206,7 @@ describe('onResize callback', () => {
     await waitForCb((resolve) => {
       onResize = resizeHandler(resolve);
       // Return to observing default element
-      context.render(<PreactResizeObserver onResize={onResize} />);
+      render(<PreactResizeObserver onResize={onResize} />);
       changeElementSize(300, 300);
     });
     expect(onResize).toBeCalledWith(300, 300);
@@ -230,11 +214,9 @@ describe('onResize callback', () => {
     await waitForCb((resolve) => {
       onResize = resizeHandler(resolve);
       // Return to observing custom element
-      context.render(<PreactResizeObserver onResize={onResize} element={customElement}/>);
+      render(<PreactResizeObserver onResize={onResize} element={customElement} />);
       changeElementSize(50, 50);
     });
     expect(onResize).toBeCalledWith(50, 50);
-
-    cleanup(context);
   });
 });

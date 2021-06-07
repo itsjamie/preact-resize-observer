@@ -3,8 +3,11 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ["src/index.tsx"],
   coverageDirectory: "coverage",
+  testEnvironment: "jsdom",
   setupFiles: [
-    "./src/helpers/tests.js",
     "./node_modules/mutationobserver-shim/dist/mutationobserver.min.js"
-  ]
+  ],
+  globals: {
+    Object: Object,
+  }
 };

@@ -4,5 +4,6 @@
   "prettier.eslintIntegration": true,
   "[javascript]": {
     "editor.formatOnSave": true
-  }
+  },
+  "jest.jestCommandLine": "yarn jest"
 }

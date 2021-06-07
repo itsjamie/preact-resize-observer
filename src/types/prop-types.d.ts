@@ -1,7 +1,7 @@
 // Copy of prop-types types package with references to React removed (react typings clash with preact's typings)
 // Source: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/adf4e18eef97454fab36830221b9b21c517af004/types/prop-types/index.d.ts
 
-// tslint:disable
+/* eslint-disable */
 declare module 'prop-types' {
 
 // Type definitions for prop-types 15.5
